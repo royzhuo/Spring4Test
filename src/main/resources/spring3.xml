@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--spring作用域
+
+    1.singleton：单例。spring容器初始化时就被创建
+    2.prototype:原型。表示spring容器初始化时，bean不会被创建，只有实例化时才会被创建。
+
+    -->
+    <bean id="address" class="foo.bar.domain.Address" scope="prototype">
+
+    </bean>
+
+    <!--spel spring表达式语言#{}-->
+    <bean id="address2" class="foo.bar.domain.Address">
+        <!--spel表示普通属性-->
+        <property name="cityName" value="#{'XiaMen'}"/>
+    </bean>
+    <bean id="car" class="foo.bar.domain.Car">
+        <property name="carName" value="aodi"/>
+        <!--spel表达静态类-->
+        <property name="price" value="#{T(java.lang.Math).abs(20000)}"/>
+        <property name="maxSpeed" value="3000"/>
+    </bean>
+    <bean id="person" class="foo.bar.domain.Person">
+        <!--spel引入外部类-->
+        <property name="car" value="#{car}"/>
+        <!--spel引入外部类属性-->
+        <property name="city" value="#{address2.cityName}"/>
+        <!--spel运算表达式-->
+        <property name="info" value="#{car.price>10?'有钱':'没钱'}"/>
+    </bean>
+</beans>

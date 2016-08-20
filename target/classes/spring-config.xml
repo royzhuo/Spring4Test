@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- <context:annotation-config/>
+     <context:component-scan base-package="foo.bar"/>-->
+
+
+    <!--装配bean 可以采用属性或构造方法来配置bean-->
+    <bean id="car" class="foo.bar.domain.Car">
+        <property name="carName" value="aodi"/>
+        <property name="price" value="10.00"/>
+        <property name="maxSpeed" value="10"/>
+    </bean>
+    <bean id="person" class="foo.bar.domain.Person">
+        <property name="name" value="shabi"/>
+        <!--如果属性是引用类型用ref-->
+        <property name="car" ref="car"/>
+    </bean>
+
+
+    <!--也可以采用构造方法来创建bean-->
+    <bean id="person2" class="foo.bar.domain.Person">
+        <constructor-arg value="shadiao2"></constructor-arg>
+        <!--<constructor-arg ref="car2"></constructor-arg>-->
+        <!--可以采用内部bean 但是不能被引用-->
+        <constructor-arg name="car">
+            <bean class="foo.bar.domain.Car">
+                <constructor-arg value="benchi"/>
+                <constructor-arg value="100"></constructor-arg>
+                <constructor-arg value="100.00"></constructor-arg>
+            </bean>
+        </constructor-arg>
+    </bean>
+    <bean id="car2" class="foo.bar.domain.Car">
+        <constructor-arg value="benchi"/>
+        <constructor-arg value="100"></constructor-arg>
+        <constructor-arg value="100.00"></constructor-arg>
+    </bean>
+
+    <!--spring支持级联属性-->
+    <bean id="person3" class="foo.bar.domain.Person">
+        <!--对属性set null-->
+        <constructor-arg name="name">
+            <null/>
+        </constructor-arg>
+        <constructor-arg name="car" ref="car"/>
+        <property name="car.price" value="1000000.00"/>
+    </bean>
+
+    <!--配置集合属性-->
+    <!--list-->
+    <bean id="person4" class="foo.bar.domain.Person">
+        <property name="name" value="zhengyangtao"/>
+        <property name="cars">
+            <list>
+                <ref bean="car"/>
+                <ref bean="car2"/>
+            </list>
+        </property>
+    </bean>
+    <!--map-->
+    <bean id="person5" class="foo.bar.domain.Person">
+        <property name="name" value="zhengyangtao"/>
+        <property name="hashCar">
+            <map>
+                <entry key="car1" value-ref="car2"/>
+                <entry key="car2" value-ref="car"/>
+            </map>
+        </property>
+    </bean>
+    <!--property hashtable的子类-->
+    <bean id="person6" class="foo.bar.domain.Person">
+        <property name="properties">
+            <props>
+                <prop key="name">root</prop>
+                <prop key="password">123</prop>
+                <prop key="url">jdbc:mysql://localhost:3306/test</prop>
+                <prop key="dirverclass">com.mysql.jdbc.driver</prop>
+            </props>
+        </property>
+    </bean>
+    <!--设置单例list集合供bean引用<import-->
+    <!-- <util:list id="list1">
+         &lt;!&ndash; <ref bean="car"/>&ndash;&gt;
+         <ref bean="car2"/>
+     </util:list>-->
+
+</beans>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--bean自动装配 autowire：1.可以通过name来自动装配bean，通过bean的setter方式找到相同的bean名称，如果有装配，没有空
+    2.通过type来装配，但ioc容器中如果有相同的两个类则会报错-->
+    <bean id="person7" class="foo.bar.domain.Person" autowire="byName">
+        <property name="name" value="shaaaaa"/>
+
+    </bean>
+    <bean id="car" class="foo.bar.domain.Car">
+        <property name="carName" value="xiandai"/>
+        <property name="maxSpeed" value="2020"/>
+        <property name="price" value="22000.00"/>
+    </bean>
+    <bean id="address" class="foo.bar.domain.Address">
+        <property name="cityName" value="xiamen"/>
+    </bean>
+    <!--bean之间的关系 -->
+    <!--继承，继承父bean属性的配置，也可以覆盖掉-->
+    <bean id="address2" class="foo.bar.domain.Address">
+        <property name="cityName" value="beijing"/>
+    </bean>
+    <bean id="address3" class="foo.bar.domain.Address" parent="address2">
+
+    </bean>
+    <bean id="address4" class="foo.bar.domain.Address" parent="address2">
+        <property name="cityName" value="shanghai"/>
+    </bean>
+    <!--抽象 abstract＝true，当一个bean没有指定class时，该bean就是抽象bean，抽象bean不能实例化,抽象bean属性的值可以装配到子bean-->
+    <bean id="address5" abstract="true">
+        <property name="cityName" value="00000"/>
+    </bean>
+    <bean id="address6" class="foo.bar.domain.Address" parent="address5">
+        <!-- <property name="cityName" value="tianjing"/>-->
+    </bean>
+    <!--依赖 被依赖的bean必须实例化-->
+    <bean id="address7" class="foo.bar.domain.Address">
+        <property name="cityName" value="222222"/>
+
+    </bean>
+    <bean id="address8" class="foo.bar.domain.Address" depends-on="address7">
+
+    </bean>
+</beans>
