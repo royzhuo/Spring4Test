@@ -48,7 +48,7 @@ public class CalaculatorLoggingProfxy {
                     //方法执行(方法执行前的操作也称作aop的前置通知)
                     result = (Integer) method.invoke(tagter, args);
                     //方法顺利进行则称作aop返回通知
-
+                    System.out.println("执行成功:");
                 } catch (Exception e) {
                     //aop的异常通知
                     System.out.println("出异常了" + e.getMessage());
