@@ -2,17 +2,19 @@
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
          http://www.springframework.org/schema/context
          http://www.springframework.org/schema/context/spring-context.xsd
          http://www.springframework.org/schema/tx
-         http://www.springframework.org/schema/tx/spring-tx.xsd
- ">
+         http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <!--导入外部文件-->
     <context:property-placeholder location="classpath:springTXDB.properties"/>
+
+    <!--添加Spring扫描包-->
+    <context:component-scan base-package="foo.bar.hibernate"></context:component-scan>
 
     <!--配置c3p0数据源-->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
@@ -24,25 +26,42 @@
         <property name="maxPoolSize" value="${jdbc.maxPool}"/>
     </bean>
 
-    <!--配置hibernate-->
+    <!--配置hibernate 获取sessionFactory-->
     <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
+        <!--配置hibernate属性-->
         <property name="hibernateProperties">
-            <value>
+            <!--<value>
                 hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
-            </value>
+            </value>-->
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+            </props>
         </property>
+        <!-- 自动扫描实体对象 foo.bar.hibernate的包结构中存放实体类 -->
+        <property name="packagesToScan" value="foo.bar.hibernate"/>
     </bean>
 
+    <!--事物管理 基于xml-->
 
-    <!--配置spring事物管理器-->
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"/>
+    <!--配置spring事物管理器 hibernate-->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
-
-    <!--开启事物注解-->
-    <tx:annotation-driven transaction-manager="transactionManager"/>
-    <!--添加扫描包-->
-    <context:component-scan base-package="foo.bar.hibernate"></context:component-scan>
+    <!--配置事物属性 传播行为等-->
+    <tx:advice transaction-manager="transactionManager" id="txAdvice">
+        <tx:attributes>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="*" read-only="false"/>
+        </tx:attributes>
+    </tx:advice>
+    <!--配置aop 事物切点，并把事物属性和切点关联起来-->
+    <aop:config >
+        <aop:pointcut id="txPoint" expression="execution(* foo.bar.hibernate.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPoint"/>
+    </aop:config>
 
 </beans>
